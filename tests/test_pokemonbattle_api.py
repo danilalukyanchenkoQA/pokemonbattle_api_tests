@@ -20,6 +20,7 @@ class TestGetTrainers:
 
     @pytest.mark.smoke
     @allure.title("Получаем тренеров из города Moscow")
+    @pytest.mark.api
     def test__trainers__city__filter__moscow(self, api_session):  # Получаем тренеров из города Moscow через API фильтр
         with allure.step("Получаем тренеров из города Москва через фильтр"):
             response = api_session.get( BASE_URL+"/trainers",
@@ -33,6 +34,7 @@ class TestGetTrainers:
 
     @pytest.mark.smoke
     @allure.title("Получение тренера по ID")
+    @pytest.mark.api
     def test__trainers__filter__id(self, api_session):  # Получение тренера по ID
         with allure.step("Делаем GET запрос с фильтром по trainer_id"):
             response = api_session.get(BASE_URL+"/trainers",
@@ -48,6 +50,7 @@ class TestGetTrainers:
 
     @pytest.mark.smoke
     @allure.title("Получение тренеров по городу с сортировкой по убыванию уровня")
+    @pytest.mark.api
     def test__trainers__city__sort__by__level(self, api_session):
         with allure.step("Делаем GET запрос с фильтром по city"):
          response = api_session.get(BASE_URL+"/trainers",
@@ -72,6 +75,7 @@ class TestCRUDPokemons:
 
     @pytest.mark.smoke
     @allure.title("Нокаут всех живых покемонов")
+    @pytest.mark.api
     def test__knockout__pokemons(self, api_session):
         """Тест 1: Нокаут всех живых покемонов"""
         with allure.step("Получаем всех покемонов тренера 50523"):
@@ -130,6 +134,7 @@ class TestCRUDPokemons:
         return pokemon_id
 
     @allure.title("Создание покемона")
+    @pytest.mark.api
     def test__create__pokemon(self, api_session):
         """Тест 2: Создание покемона"""
         with allure.step("Создаем покемона"):
@@ -152,6 +157,7 @@ class TestCRUDPokemons:
 
     @pytest.mark.skip
     @allure.title("Полный CRUD покемона")
+    @pytest.mark.api
     def test__full_crud(self, api_session):
         print("ЗАПУСКАЕМ ПОЛНЫЙ CRUD!")
 
