@@ -1,4 +1,3 @@
-from ast import compare
 from http.client import responses
 
 import time
