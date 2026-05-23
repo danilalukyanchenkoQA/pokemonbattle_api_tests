@@ -1,0 +1,15 @@
+# Переменные окружения
+.env
+
+# Виртуальное окружение
+.venv/
+
+
+# Файлы созданные Python
+.idea/
+__pycache__/
+tests/__pycache__/
+
+
+allure-results
+allure-report
