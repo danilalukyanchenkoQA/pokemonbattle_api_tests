@@ -1,0 +1,136 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  ruff:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install ruff
+        run: |
+          python --version
+          python -m pip install --upgrade pip
+          pip install ruff
+
+      - name: Run ruff
+        run: |
+          echo "Запуск ruff"
+          ruff check .
+
+  flake8:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install flake8
+        run: |
+          python --version
+          python -m pip install --upgrade pip
+          pip install flake8
+
+      - name: Run flake8
+        run: |
+          echo "Запуск flake8"
+          flake8 . > flake8-report.txt
+
+      - name: Upload flake8 report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flake8-report
+          path: flake8-report.txt
+          retention-days: 7
+
+  pylint:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install pylint
+        run: |
+          python --version
+          python -m pip install --upgrade pip
+          pip install pylint
+
+      - name: Run pylint
+        run: |
+          echo "Запуск pylint"
+          pylint .
+
+  tests:
+    runs-on: ubuntu-latest
+    needs: [ruff, flake8, pylint]
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup environment
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends default-jre-headless nodejs npm
+          npm install -g allure-commandline --unsafe-perm=true
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: |
+          set +e
+          echo "Запуск api тестов"
+          pytest -m api --alluredir=allure-results
+
+          status=$?
+          echo "Pytest exit code $status"
+
+          echo "Генерация отчёта"
+          allure generate allure-results/ -o allure-report/ --single-file
+
+          exit $status
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: allure-results/
+          retention-days: 7
+
+      - name: Upload allure report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: allure-report/
+          retention-days: 7
