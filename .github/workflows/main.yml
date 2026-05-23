@@ -134,3 +134,12 @@ jobs:
           name: allure-report
           path: allure-report/
           retention-days: 7
+
+  final_job:
+    runs-on: ubuntu-latest
+    needs: tests
+    if: always()
+    steps:
+      - name: Print final message
+        run: echo "Пайплайн завершён"
+        
